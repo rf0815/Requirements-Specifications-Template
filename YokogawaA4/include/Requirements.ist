@@ -1,0 +1,5 @@
+% http://tex.stackexchange.com/questions/249128/makeindex-style
+% https://de.sharelatex.com/learn/Indices#/Keys_to_create_styles_files
+delim_0 "\\dotfill\ "
+delim_1 "\\dotfill\ "
+headings_flag 0

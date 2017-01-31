@@ -1,0 +1,12 @@
+% http://tex.stackexchange.com/questions/249128/makeindex-style
+
+delim_0 "\\dotfill\ "
+delim_1 "\\dotfill\ "
+headings_flag 1
+%heading_prefix "\\vspace*{0.3cm}\\nopagebreak\n\\tikz\\node at (0pt,0pt)
+%[rounded corners=5pt,draw=ocre,fill=ocre!10,line width=1pt,inner sep=5pt]
+%{\\parbox
+%  {\\linewidth\\fboxsep\\fboxrule}
+%  {\\centering\\small\\sffamily\\bfseries\\textcolor{blue}{" heading_suffix "}}
+%}
+%;\\vspace*{0.2cm}\\nopagebreak\n"

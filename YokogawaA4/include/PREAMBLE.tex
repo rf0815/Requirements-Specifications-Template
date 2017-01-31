@@ -1,0 +1,385 @@
+\documentclass[12pt]{book}%
+%
+%%------------------------------
+% PREAMBLE
+% Standard Header Definitions
+% .rf. Jan/2017
+%%------------------------------
+%
+\newcommand{\YOdoLog}[1]{\typeout{*** }\typeout{*** #1 }\typeout{*** }}%
+\YOdoLog {PARSING PREAMBLE }%
+%
+%%-------------------------------------
+%%  --  YO(kogawa) VARs and Makros --
+%%-------------------------------------
+%
+\newcommand{\YOincludePath}      {../include}
+\newcommand{\YOreqfile}          {Requirements.lis}
+%
+\newcommand{\YOprintReqCheckList}{}%            % Print Requirements List Table
+\newcommand{\YOmakeTOC}       [1]{}%            % Yokogawa Inhaltsverzeichnis erstellen (0=nein, 1=ja)
+\newcommand{\YOmakeTitlePage} [1]{}%            % Yokogawa Deckblatt erstellen          (0=nein, 1=ja)
+\newcommand{\YOmakeIndex}     [1]{}%            % Yokogawa Index erstellen              (0=nein, 1=ja)
+\newcommand{\YOprintIndex}       {}%            % Yokogawa Index drucken
+\newcommand{\YOcounter}          {}%            % increment and print counter
+\newcommand{\YOsubcounter}       {}%            % increment and print subcounter
+\newcommand{\YOsetcounter}    [1]{}%            % set new value to counter
+\newcommand{\YOsetsubcounter} [1]{}%            % set new value to subcounter
+\newcommand{\YOreqref}        [1]{}%            % reference to Requirement .. wie \ref und \pageref
+\newcommand{\YOrequirement}   [3]{}%            % create REQ    (Header, Text, optional: Label)
+\newcommand{\YOsubrequirement}[3]{}%            % create SubREQ (Header, Text, optional: Label)
+%
+\newcommand   {\YOprintReq}   [3]{\printRequirementBox         {#1}{#2}{#3}}%    Req-No., Titel, Text
+\newcommand   {\YOprintSubReq}[3]{\printSubRequirementBox      {#1}{#2}{#3}}% SubReq-No., Titel, Text
+\renewcommand {\YOprintReq}   [3]{\printRequirementDescription {#1}{#2}{#3}}%    Req-No., Titel, Text
+\renewcommand {\YOprintSubReq}[3]{\printRequirementDescription {#1}{#2}{#3}}% SubReq-No., Titel, Text
+%
+%%-- Yokogawa Logo Definitons ---
+%
+\newcommand {\YokogawaLogo}{\YOincludePath/YokogawaLogo.png}%
+\newcommand {\yokogawa}{\mbox{\includegraphics
+                        [trim=0 10pt 0 0 ,width=0.15\columnwidth]{\YokogawaLogo}\ }}%
+\newcommand {\Yokogawa}{\yokogawa}%
+%
+% central footer text
+\newcommand{\YOcfooter}{ \directlua{tex.print(math.random())}  }%
+%
+%%------------------------------
+%
+\def\pgfsysdriver{pgfsys-pdftex.def}%
+%
+\usepackage{luatex85}%
+\usepackage{luacode}%
+%
+\usepackage{lmodern}%                           % allows different font sizes
+\usepackage{aurical}%
+\usepackage[T1]{fontenc}%
+\usepackage{fetamont}%
+\usepackage[T1]{fontenc}%
+%
+\usepackage{ifthen}%
+\usepackage{blindtext}%
+\usepackage{titlesec}%
+\usepackage{setspace}%
+\usepackage{chngcntr}%                          % counter ctrl settings
+\usepackage{verbatim}%
+\usepackage{fancyhdr}%                          % Required for custom headers
+%
+\usepackage{lastpage}%                          % Required to determine the
+%                                               % last page for the footer
+\usepackage{longtable}
+\usepackage{tabularx,colortbl}%
+%
+\usepackage{extramarks}%                        % Required for headers and
+%                                               % footers
+\usepackage{xcolor}%
+\usepackage{float}%                             % needed to place grafics
+%                                               % exactly at .. position
+\usepackage[utf8]{luainputenc}%
+\usepackage{graphicx}%                          % Required to insert images
+%
+\usepackage{draftwatermark}%
+%
+\usepackage{imakeidx}%
+\usepackage{tikz}%
+%
+\usepackage[colorlinks=true,%                   % sollte wegen Nebeneffekten
+	        urlcolor=blue,%                     % das letzte Paket in der
+	        linkcolor=black]{hyperref}%         % Liste sein ..
+%
+\renewcommand*{\thechapter}{\arabic{chapter}}%  % modify chapter and counter
+%                                               % numbering
+\renewcommand*{\thesection}{\arabic{section}}%
+%
+\setcounter{secnumdepth}{5}%
+\counterwithout{figure}{chapter}%               % use counter without chapter#
+%
+% Margins
+\topmargin      =-0.2  in%
+\evensidemargin = 0    in%
+\oddsidemargin  = 0    in%
+\textwidth      = 6.5  in%
+\textheight     = 9.0  in%
+\headsep        = 0.25 in%
+\headheight     = 16pt%
+\parskip        =  8pt%
+\linespread{1.1}%                               % Line spacing
+\author{}%                                      % not used .. using
+%                                               % hwkAuthorName instead
+%
+%\flushbottom                                   % beeinflusst die
+\raggedbottom                                   % vertikaleAusrichtung
+\hbadness=10000%                                % horizontale Ausrichtung
+%
+\newcommand{\textbiu}[1]{\emph{\underline{\textbf{#1}}}}% set text bold-italy-underline%
+%
+\definecolor{ocre}{HTML}{F16723}%               % für Index-Style Definition
+%
+%----------------------------------------------------------------------------------------
+% Set up the header and footer
+%----------------------------------------------------------------------------------------
+%
+\fancyhf{}%                                     % Clear header/footer
+\chead{\textbf{Header}}%                        % Centre header
+\cfoot{\textbf{Footer}\ \thepage}%              % Centre footer
+%
+\pagestyle{fancy}%
+\makeatletter%
+  \let\ps@plain\ps@fancy%                       % plain page style = fancy
+\makeatother%
+%
+\chead{\YOTitle}%                               % Top center header
+\rhead{\firstxmark}%                            % Top right header
+\lhead{\Yokogawa}%                              % Top left header
+%
+\lfoot{\vspace{-0.12in}\tiny \today\\
+                             \YOAuthorName}%    % Bottom left footer
+\cfoot{\YOcfooter}%                             % Bottom center footer
+\rfoot{Page\ \thepage\ /\ \pageref{LastPage}}%  % Bottom right footer
+%
+\renewcommand\headrulewidth{0.4pt}%             % Size of the header rule
+\renewcommand\footrulewidth{0.4pt}%             % Size of the footer rule
+%
+\setlength\parindent{0pt}%                      % Removes indentation from
+%
+%
+%% -------- Contents Makro ----------------------------
+%
+\renewcommand{\YOmakeTOC}[1]{%
+    \setcounter{tocdepth}{5}%
+    \ifthenelse{#1=1}{%
+        \newpage%
+        \renewcommand{\contentsname}{Inhalt}%
+        \tableofcontents%
+        \newpage%
+    }%  end if
+    {}% else
+}% end \YOmakeTOC
+%
+%% -------- Title Page Makro  ----------------------------
+%
+\renewcommand{\YOmakeTitlePage}[1]{%
+    \ifthenelse{#1=1}{%
+        \maketitle%
+    }%  end if
+    {}% else
+    \pagenumbering{arabic}%
+    \setcounter{page}{1}%
+}% end \YOmakeTitlePage%
+%%
+%% -------- Index Generation Makros ----------------------------
+%% Makeindex Default Parameter in WinEDT : "%pm" "%N.idx"
+%%
+\newcommand{\YOmakeIndexPar}{0}%    lokaler Merker
+\renewcommand{\YOmakeIndex}[1]{%
+    \ifthenelse{#1=1}%
+      { % then make 2 indexes : the normal one and one for Requirements
+        \makeindex[name=Requirements,title={List of Requirements},options= -s
+            \YOincludePath/Requirements.ist, columns=1,intoc=true]%
+        \makeindex[options= -s
+            \YOincludePath/YokogawaA4.ist, columns=2,intoc=true]%
+      }  % end if
+      {} % else
+    \renewcommand{\YOmakeIndexPar}{#1}%          % Parameter merken für \YOprintindex
+}% end \YOmakeIndex
+
+\renewcommand{\YOprintIndex}{%
+    \ifthenelse{\YOmakeIndexPar=1}%
+      {% then
+%       \addcontentsline{toc}{section}{Index}
+        \printindex%
+        \printindex[Requirements]%               % Requirements index
+      } % end if
+      {}% else
+}% end \YOprintIndex
+%%
+%% -------- zwei allgemeine counter definieren ----------------------------
+%%
+\newcounter{YOcounter}%
+\newcounter{YOsubcounter}%
+%%
+%% -- increment counter and reset subcounter, then print counter
+\renewcommand{\YOcounter}{\addtocounter{YOcounter}{1}\setcounter{YOsubcounter}{0}\arabic{YOcounter}}%
+%% -- increment and print subcounter
+\renewcommand{\YOsubcounter}{\addtocounter{YOsubcounter}{1}\arabic{YOsubcounter}}%
+%%
+%% -- set new values to counter
+\renewcommand{\YOsetcounter}[1]{\setcounter{YOcounter}{#1}}%
+\renewcommand{\YOsetsubcounter}[1]{\setsubcounter{YOcounter}{#1}}%
+%%
+%% -------- Makros für REQirements definieren ----------------------------
+%% -------- die auch referenzierbar sind ---------------------------------
+%%
+\renewcommand{\YOreqref}[1]{\reqref{#1}}%    % reference to Requirement .. wie \ref und \pageref
+\newcommand{\reqref}[1]{REQ \ref{REQ:#1}}%   % \reqref .. wie \ref und \pageref
+%%
+%% --------- lokale Definitionen ------------------------------------------
+%%
+\newcounter{req}%
+\newcounter{subreq}[req]%
+%
+\newcounter{reqsorter}%         % lokale Merker zum Mitzählen der Einträge.
+\newcounter{sorter}%            % werden später zur Sortierung im Index gebraucht
+%
+\newcommand{\tmpIdxMain}{}% % lokaler Merker zum Nachhalten der Hierarchiestufe
+%
+\renewcommand\thesubreq{\thereq.\arabic{subreq}}%    %lokale Definition
+%%
+\usepackage{tcolorbox}
+\newcommand{\printRequirementBox}[3]{
+\begin{tcolorbox}[width=\textwidth,colback={red},title={#1 #2},
+                  outer arc=0mm,colupper=white]
+       #3
+\end{tcolorbox}
+}
+
+\newcommand{\printSubRequirementBox}[3]{
+\begin{tcolorbox}[width=\textwidth,colback={lightgray},title={#1 #2},
+                  colbacktitle=yellow,coltitle=blue]
+    #3
+\end{tcolorbox}
+}
+
+\newcommand{\printRequirementDescription}[3]{
+  \begin{description}%                                  % jetzt den Request als "description" ausgeben
+      \item [#1] \textbf{#2}
+
+       #3%                                              % den Request Text ausgeben
+  \end{description}%
+}
+%%
+%% -------- Neuen Requirement Eintrag erzeugen ----------------------------
+% Example:
+%%    \requirement{Requirement Header}{Req.text}{ReqLbl}
+%%    #1 REQ-Header,  #2 Text, #3 optional Label für \pageref und \reqref
+%%
+\renewcommand{\YOrequirement}[3]{
+              \requirement{#1}{#2}{#3}}%                % Params = Header, Text, optional: Label
+%
+\newcommand{\requirement}[3]{%
+  \refstepcounter{reqsorter}                            % mitzählen
+  \refstepcounter{req}
+  \renewcommand{\tmpIdxMain}{REQ~\thereq~#1}%           % Eintrag für Index merken
+  \index[Requirements]{\thereqsorter@\tmpIdxMain!}%     % Indexeintrag merken
+  \YOprintReq{REQ~\thereq}{#1}{#2}
+  \ifthenelse{\equal{#3}{}}{}{\label{REQ:#3}\label{#3}} % je ein Label für Nr und Seite setzen
+  \addReqToList{\thereq}{#1}                            % und in temp Req-Datei schreiben
+}% end \requirement
+%
+%% -------- Neuen Sub-Requirement Eintrag erzeugen --------------------------
+%
+\renewcommand{\YOsubrequirement}[3]{
+              \subrequirement{#1}{#2}{#3}}%             % Params = Header, Text, optional: Label
+%
+\newcommand{\subrequirement}[3]{%
+  \refstepcounter{sorter}                               % mitzählen
+  \refstepcounter{subreq}
+  \index[Requirements]{\thereqsorter@\tmpIdxMain!\thesorter@\thesubreq~#1}% %hier den sorter
+%    vor den Indexeintrag setzen, damit später richtig sortiert werden kann
+  \YOprintSubReq {REQ~\thesubreq}{#1}{#2}
+  \ifthenelse{\equal{#3}{}}{}{\label{REQ:#3}\label{#3}} % je ein Label für No und Seite setzen
+  \addReqToList{\thesubreq}{#1}                         % und in temp Req-Datei schreiben
+}% end \subrequirement
+%
+%% -------- Überschriftenfarben setzen ----------------------------
+%%
+\newcommand{\YOtitleColor}{black}%	
+\titleformat{\section}%
+ 	{\color{\YOtitleColor}\normalfont\Large\bfseries}%
+ 	{\color{\YOtitleColor}\thesection}{1em}{}%
+%
+\titleformat{\subsection}%
+ 	{\color{\YOtitleColor}\normalfont\Large\bfseries}%
+ 	{\color{\YOtitleColor}\thesubsection}{1em}{}%
+%
+\titleformat{\subsubsection}%
+ 	{\color{\YOtitleColor}\normalfont\bfseries}%
+ 	{\color{\YOtitleColor}\thesubsubsection}{1em}{}%
+%
+\titleformat{\paragraph}%
+ 	{\color{\YOtitleColor}\normalfont\bfseries}%
+ 	{\color{\YOtitleColor}\theparagraph}{1em}{}%
+%
+\titleformat{\subparagraph}%
+ 	{\color{\YOtitleColor}\normalfont\bfseries}%
+ 	{\color{\YOtitleColor}\thesubparagraph}{1em}{}%
+%
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+%
+\title{%
+  \begin{figure}[!htp]%                          % set Yokogawa Logo on Title
+    \center%                                     % page
+      \includegraphics[width=0.50\columnwidth]{\YokogawaLogo}\\%
+  \end{figure}%
+  %
+  \vspace{2in}%
+  \textmd{\textbf{\YOTitle}}\\%
+  \textmd{\textbf{\YOSubTitle}}\\%
+  %
+  \vspace{2in}%
+  \vspace{0.1in}\normalsize{\textit{\YOVersion\ }}   \\%
+  \vspace{0.1in}\normalsize{\textit{\YOAuthorName\ }} \\%
+  %
+  \date{\normalsize \YODate}%
+}%
+%
+\pagenumbering{Alph}%
+%
+\SetWatermarkText{\YOWaterMark}%                %%%  put a watermark
+\SetWatermarkScale{0.5}%                        %%%  on all pages.
+\SetWatermarkColor{\YOWaterMarkColor}%
+%
+%
+%----Lua Commands addReqToList ------------------------------------
+
+\newcommand{\addReqToList}[2]{
+\directlua{%
+  if #1==1 then
+    file = io.open("\YOreqfile", "w")
+  else
+    file = io.open("\YOreqfile", "a")
+  end
+  io.output(file)
+  io.write("#1")
+  io.write(string.char(38))
+  io.write("#2")
+  io.write(string.char(38))
+  io.write("  ")
+  io.write(string.char(92))
+  io.write(string.char(92))
+  io.write(string.char(13))
+  io.close(file)
+ }%
+}% end addReqToList
+%----------------------------------------------------------------------------------------
+%
+%----Lua Command readReqList ------------------------------------
+\renewcommand{\YOprintReqCheckList}{\readReqList} % cmd to Print Requirements List Table
+\newcommand{\reqTableLine}{ & & \\}
+\newcommand{\readReqList}{
+\newpage
+%\LARGE{\textbf {Requirements Check List}}
+\section {Requirements Check List}
+\renewcommand*{\arraystretch}{2.4}
+\begin{longtable}{| l | p{.60\textwidth} |p{.20\textwidth}|}
+\hline
+\rowcolor{yellow}  \textbf {REQ No.} & \textbf {Description} & \textbf {Comment} \\
+\hline \endhead
+\directlua{%
+   file = io.open("\YOreqfile", "r")
+   if not (file==nil) then
+   for line in file:lines() do
+      tex.print(line)
+      tex.print([[\noexpand\hline]])
+%     tex.print([[\noexpand\reqTableLine]])
+    end
+    io.close(file)
+    end
+ }% end directlua
+\hline
+\end{longtable}
+}% end readReqList
+%----------------------------------------------------------------------------------------
+\YOdoLog {PARSING PREAMBLE FINISHED}%
